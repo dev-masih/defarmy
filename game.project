@@ -1,0 +1,17 @@
+[project]
+title = DefArmy
+version = 1.0
+dependencies = https://github.com/dev-masih/defgraph/archive/master.zip
+
+[library]
+include_dirs = defarmy
+
+[input]
+game_binding = /examples/main.input_bindingc
+
+[bootstrap]
+main_collection = /examples/example_rotation/example_rotation_main.collectionc
+
+[script]
+shared_state = 1
+

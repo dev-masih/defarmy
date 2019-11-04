@@ -1,0 +1,79 @@
+-- require defarmy
+local defarmy = require "defarmy.defarmy"
+
+local defgraph = require "defgraph.defgraph"
+
+function init(self)
+    msg.post(".", "acquire_input_focus")
+
+    self.speed = 50
+
+    -- Creating a graph with defgraph
+    defgraph.map_set_properties(2, 5, 5, 50, true)
+    defgraph.debug_set_properties(vmath.vector4(1, 0, 1, 1), vmath.vector4(0, 1, 0, 1), vmath.vector4(0, 1, 1, 1), 3)
+    local node01 = defgraph.map_add_node(vmath.vector3(100, 100, 0))
+    local node02 = defgraph.map_add_node(vmath.vector3(100, 270, 0))
+    local node03 = defgraph.map_add_node(vmath.vector3(100, 500, 0))
+    local node04 = defgraph.map_add_node(vmath.vector3(500, 500, 0))
+    local node05 = defgraph.map_add_node(vmath.vector3(500, 270, 0))
+    local node06 = defgraph.map_add_node(vmath.vector3(500, 100, 0))
+    defgraph.map_add_route(node01, node02, true)
+    defgraph.map_add_route(node02, node03, true)
+    defgraph.map_add_route(node03, node04, true)
+    defgraph.map_add_route(node04, node05, true)
+    defgraph.map_add_route(node05, node06, true)
+    defgraph.map_add_route(node06, node01, true)
+
+    self.go_pos_1 = vmath.vector3(270, 300, 0)
+    self.go_pos_2 = vmath.vector3(320, 300, 0)
+    self.movement_data_1 = defgraph.move_initialize(self.go_pos_1, { node02, node05 }, defgraph.ROUTETYPE.CYCLE, vmath.vector3(0, 1, 0))
+    self.movement_data_2 = defgraph.move_initialize(self.go_pos_2, { node02, node05 }, defgraph.ROUTETYPE.CYCLE, vmath.vector3(0, 1, 0))
+
+    -- Creating an army and a soldier
+    self.army_id_1 = defarmy.army_create(self.go_pos_1, go.get_rotation(), 18, true, defarmy.PATTERN.TOP_TO_BOTTOM_SQUARE)
+    self.army_id_2 = defarmy.army_create(self.go_pos_2, go.get_rotation(), 18, false, defarmy.PATTERN.BOTTOM_TO_TOP_SQUARE)
+
+    factory.create("#factory", vmath.vector3(300, 300, 0), nil, { army_id = self.army_id_1, tint = vmath.vector4(1, 0, 0, 1) }, 0.35)
+    factory.create("#factory", vmath.vector3(300, 300, 0), nil, { army_id = self.army_id_2, tint = vmath.vector4(0, 1, 0, 1) }, 0.35)
+        
+    timer.delay(1.5, true, function()
+        factory.create("#factory", vmath.vector3(300, 300, 0), nil, { army_id = self.army_id_1, tint = vmath.vector4(1, 0, 0, 1) }, 0.35)
+        factory.create("#factory", vmath.vector3(300, 300, 0), nil, { army_id = self.army_id_2, tint = vmath.vector4(0, 1, 0, 1) }, 0.35)
+	end)
+end
+
+function on_input(self, action_id, action)
+    if action_id == hash("left_click") and action.pressed then
+        factory.create("#factory", vmath.vector3(action.x, action.y, 0), nil, { army_id = self.army_id_1, tint = vmath.vector4(1, 0, 0, 1) }, 0.35)
+    end
+    if action_id == hash("right_click") and action.pressed then
+        factory.create("#factory", vmath.vector3(action.x, action.y, 0), nil, { army_id = self.army_id_2, tint = vmath.vector4(0, 1, 0, 1) }, 0.35)
+    end
+end
+
+function update(self, dt)
+
+    self.movement_data_1, self.move_result_1 = defgraph.move_player(self.go_pos_1, self.speed * dt, self.movement_data_1)
+    self.movement_data_2, self.move_result_2 = defgraph.move_player(self.go_pos_2, self.speed * dt, self.movement_data_2)
+
+    self.go_pos_1 = self.move_result_1.position
+    self.go_pos_2 = self.move_result_2.position
+
+    defarmy.army_update_position(self.army_id_1, self.move_result_1.position)
+    defarmy.army_update_position(self.army_id_2, self.move_result_2.position)
+
+    defarmy.army_update_rotation(self.army_id_1, self.move_result_1.rotation)
+    defarmy.army_update_rotation(self.army_id_2, self.move_result_2.rotation)
+
+    -- draw debug info of nodes and routes
+    defgraph.debug_draw_map_nodes()
+    defgraph.debug_draw_map_routes()
+
+    defgraph.debug_draw_player_move(self.movement_data_1, vmath.vector4(1, 1, 0, 1))
+    defgraph.debug_draw_player_move(self.movement_data_2, vmath.vector4(1, 0, 1, 1))
+
+    msg.post("@render:", "draw_text", { text = "example with DefGraph", position = vmath.vector3(20, 630, 0) } )
+    msg.post("@render:", "draw_text", { text = "left click: deploy red dot - right click: deploy green dot", position = vmath.vector3(20, 610, 0) } )
+    msg.post("@render:", "draw_text", { text = "red pattern: TOP_TO_BOTTOM_SQUARE - green pattern: BOTTOM_TO_TOP_SQUARE", position = vmath.vector3(20, 590, 0) } )
+    msg.post("@render:", "draw_text", { text = "red army: sticky - green army: not sticky", position = vmath.vector3(20, 570, 0) } )
+end

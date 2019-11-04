@@ -1,0 +1,44 @@
+key_trigger {
+  input: KEY_A
+  action: "key_a"
+}
+key_trigger {
+  input: KEY_S
+  action: "key_s"
+}
+key_trigger {
+  input: KEY_D
+  action: "key_d"
+}
+key_trigger {
+  input: KEY_1
+  action: "key_1"
+}
+key_trigger {
+  input: KEY_2
+  action: "key_2"
+}
+key_trigger {
+  input: KEY_3
+  action: "key_3"
+}
+key_trigger {
+  input: KEY_4
+  action: "key_4"
+}
+key_trigger {
+  input: KEY_5
+  action: "key_5"
+}
+key_trigger {
+  input: KEY_6
+  action: "key_6"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "left_click"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_2
+  action: "right_click"
+}

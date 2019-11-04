@@ -1,0 +1,19 @@
+go.property("army_id", 1)
+go.property("tint", vmath.vector4(0, 1, 0, 1))
+
+-- require defarmy
+local defarmy = require("defarmy.defarmy")
+
+function init(self)
+	sprite.set_constant("#sprite", "tint", self.tint)
+
+	-- Create a new soldier in defarmy
+	self.soldier_id = defarmy.soldier_create(go.get_position(), vmath.vector3(0, 1, 0), self.army_id)
+end
+
+function update(self, dt)
+	-- fetch each step position and rotation from defarmy
+	local soldier_position, soldier_rotation = defarmy.soldier_move(self.soldier_id, go.get_position(), 80 * dt)
+	go.set_position(soldier_position)
+	go.set_rotation(soldier_rotation)
+end

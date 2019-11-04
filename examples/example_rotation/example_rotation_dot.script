@@ -1,0 +1,20 @@
+go.property("army_id", 1)
+go.property("debug", false)
+
+-- require defarmy
+local defarmy = require("defarmy.defarmy")
+
+function init(self)
+	-- get army id from main
+	self.soldier_id = defarmy.soldier_create(go.get_position(), vmath.vector3(0, 1, 0), self.army_id)
+
+	if self.debug then
+		defarmy.soldier_debug_on(self.soldier_id, vmath.vector4(1, 0, 0, 1))
+	end
+end
+
+function update(self, dt)
+	local soldier_position, soldier_rotation = defarmy.soldier_move(self.soldier_id, go.get_position(), 80 * dt)
+	go.set_position(soldier_position)
+	go.set_rotation(soldier_rotation)
+end

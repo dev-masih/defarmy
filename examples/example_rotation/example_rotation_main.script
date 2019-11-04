@@ -1,0 +1,131 @@
+-- require defarmy
+local defarmy = require "defarmy.defarmy"
+
+function init(self)
+    msg.post(".", "acquire_input_focus")
+
+    self.soldier_debug = false
+    self.army_debug = false
+    self.army_is_sticky = true
+    self.army_pattern = defarmy.PATTERN.BOTTOM_TO_TOP_SQUARE
+
+    -- Creating an army and a soldier
+    self.army_id = defarmy.army_create(vmath.vector3(250, 250, 0), vmath.quat(), 25, self.army_is_sticky, self.army_pattern)
+
+    for i = 1, 50 do
+        factory.create("#factory", vmath.vector3(250, 250, 0), nil, { army_id = self.army_id, debug = self.soldier_debug }, 0.45)
+    end
+end
+
+local function custom_pattern_function(count)
+    local result = {}
+    local sum = count
+    for i = 1 ,count do
+        local partial = math.modf(sum / 4)
+        if partial == 1 then
+            table.insert(result, sum)
+            return result
+        end
+        table.insert(result, partial)
+        sum = sum - partial
+    end
+end
+
+function on_input(self, action_id, action)
+    if action_id == hash("left_click") and action.pressed then
+        factory.create("#factory", vmath.vector3(action.x, action.y, 0), nil, { army_id = self.army_id, debug = self.soldier_debug }, 0.45)
+    end
+    if action_id == hash("right_click") then
+        local direction_vector = vmath.vector3(action.x, action.y, 0) - vmath.vector3(250, 250, 0)
+        direction_vector = vmath.normalize(direction_vector)
+        local quat = vmath.quat_from_to(vmath.vector3(0, 1, 0), direction_vector)
+
+        defarmy.army_update_rotation(self.army_id, quat)
+    end
+    if action_id == hash("key_a") and action.pressed then
+        local members = defarmy.army_members(self.army_id)
+        if self.soldier_debug then
+            for i = 1, #members do defarmy.soldier_debug_off(members[i]) end
+            self.soldier_debug = false
+        else
+            for i = 1, #members do defarmy.soldier_debug_on(members[i], vmath.vector4(1, 0, 0, 1)) end
+            self.soldier_debug = true
+        end
+    end
+    if action_id == hash("key_s") and action.pressed then
+        if self.army_debug then self.army_debug = false else self.army_debug = true end
+    end
+    if action_id == hash("key_d") and action.pressed then
+        if self.army_is_sticky then
+            self.army_is_sticky = false
+        else
+            self.army_is_sticky = true
+        end
+        defarmy.army_update_stickiness(self.army_id, self.army_is_sticky)
+    end
+    if action_id == hash("key_1") and action.pressed then
+        self.army_pattern = defarmy.PATTERN.BOTTOM_TO_TOP_SQUARE
+        defarmy.army_update_pattern(self.army_id, self.army_pattern)
+    end
+    if action_id == hash("key_2") and action.pressed then
+        self.army_pattern = defarmy.PATTERN.TOP_TO_BOTTOM_SQUARE
+        defarmy.army_update_pattern(self.army_id, self.army_pattern)
+    end
+    if action_id == hash("key_3") and action.pressed then
+        self.army_pattern = defarmy.PATTERN.TRIANGLE
+        defarmy.army_update_pattern(self.army_id, self.army_pattern)
+    end
+    if action_id == hash("key_4") and action.pressed then
+        self.army_pattern = defarmy.PATTERN.RHOMBUS_TALL
+        defarmy.army_update_pattern(self.army_id, self.army_pattern)
+    end
+    if action_id == hash("key_5") and action.pressed then
+        self.army_pattern = defarmy.PATTERN.RHOMBUS_SHORT
+        defarmy.army_update_pattern(self.army_id, self.army_pattern)
+    end
+    if action_id == hash("key_6") and action.pressed then
+        self.army_pattern = defarmy.PATTERN.CUSTOMIZED
+        defarmy.army_update_pattern(self.army_id, self.army_pattern, custom_pattern_function)
+    end
+end
+
+function update(self, dt)
+    if self.army_debug then
+        defarmy.army_debug_draw(self.army_id, vmath.vector4(0, 1, 0, 1))
+    end
+
+    msg.post("@render:", "draw_text", { text = "example rotation", position = vmath.vector3(20, 630, 0) } )
+    msg.post("@render:", "draw_text", { text = "left click: deploy soldier - right click: change rotation", position = vmath.vector3(20, 610, 0) } )
+
+    if self.soldier_debug then
+        msg.post("@render:", "draw_text", { text = "key \"A\" trigger soldiers debug draw: ON", position = vmath.vector3(20, 590, 0) } )
+    else
+        msg.post("@render:", "draw_text", { text = "key \"A\" trigger soldiers debug draw: OFF", position = vmath.vector3(20, 590, 0) } )
+    end
+
+    if self.army_debug then
+        msg.post("@render:", "draw_text", { text = "key \"S\" trigger army debug draw: ON", position = vmath.vector3(20, 570, 0) } )
+    else
+        msg.post("@render:", "draw_text", { text = "key \"S\" trigger army debug draw: OFF", position = vmath.vector3(20, 570, 0) } )
+    end
+
+    if self.army_is_sticky then
+        msg.post("@render:", "draw_text", { text = "key \"D\" trigger army stickiness: Sticky", position = vmath.vector3(20, 550, 0) } )
+    else
+        msg.post("@render:", "draw_text", { text = "key \"D\" trigger army stickiness: Not Sticky", position = vmath.vector3(20, 550, 0) } )
+    end
+
+    if self.army_pattern == defarmy.PATTERN.BOTTOM_TO_TOP_SQUARE then
+        msg.post("@render:", "draw_text", { text = "key \"1-2-3-4-5-6\" change army pattern: BOTTOM_TO_TOP_SQUARE", position = vmath.vector3(20, 530, 0) } )
+    elseif self.army_pattern == defarmy.PATTERN.TOP_TO_BOTTOM_SQUARE then
+        msg.post("@render:", "draw_text", { text = "key \"1-2-3-4-5-6\" change army pattern: TOP_TO_BOTTOM_SQUARE", position = vmath.vector3(20, 530, 0) } )
+    elseif self.army_pattern == defarmy.PATTERN.TRIANGLE then
+        msg.post("@render:", "draw_text", { text = "key \"1-2-3-4-5-6\" change army pattern: TRIANGLE", position = vmath.vector3(20, 530, 0) } )
+    elseif self.army_pattern == defarmy.PATTERN.RHOMBUS_TALL then
+        msg.post("@render:", "draw_text", { text = "key \"1-2-3-4-5-6\" change army pattern: RHOMBUS_TALL", position = vmath.vector3(20, 530, 0) } )
+    elseif self.army_pattern == defarmy.PATTERN.RHOMBUS_SHORT then
+        msg.post("@render:", "draw_text", { text = "key \"1-2-3-4-5-6\" change army pattern: RHOMBUS_SHORT", position = vmath.vector3(20, 530, 0) } )
+    else
+        msg.post("@render:", "draw_text", { text = "key \"1-2-3-4-5-6\" change army pattern: CUSTOMIZED", position = vmath.vector3(20, 530, 0) } )
+    end
+end
