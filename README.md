@@ -25,6 +25,8 @@ local defarmy = require("defarmy.defarmy")
 ```
 Then you can use the DefArmy functions using this module.  
 
+[Official Defold game asset page for DefArmy](https://defold.com/assets/defarmy/)
+
 ## Army Settings  
 There are several parameters that you can assign to an army and you can change these parameters at any time.
 #### **Pattern:**  
