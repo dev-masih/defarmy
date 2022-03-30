@@ -160,10 +160,12 @@ Turn off soldier position debugging.
 * **soldier_id** `(number)` - Soldier id number  
 
 ## Donations  
-If you really like my work and want to support me, consider donating to me with BTC or ETH. All donations are optional and are greatly appreciated. 🙏  
+If you really like my work and want to support me, consider donating to me with LTC, BTC or ETH. All donations are optional and are greatly appreciated. 🙏  
 
-BTC: `1EdDfXRuqnb5a8RmtT7ZnjGBcYeNzXLM3e`  
-ETH: `0x99d3D5816e79bCfB2aE30d1e02f889C40800F141`  
+| LTC  | BTC | ETH |
+| ------------- | ------------- | ------------- |
+| ![LTC](https://user-images.githubusercontent.com/8469800/160749469-811a4395-4b71-4e03-890d-6f260c4ff36a.jpeg) | ![BTC](https://user-images.githubusercontent.com/8469800/160749502-c5b380d3-455f-483f-9f7f-d6948949259d.jpeg) | ![ETH](https://user-images.githubusercontent.com/8469800/160749569-ad99965c-ddd5-43da-8728-4b79c37fc3f5.jpeg) |
+| ltc1qm6r32vjahm8wwd688enxnutks0jffc3kqg7ps5  | bc1qcuuc5r4jw38vf2eztsxag68papuwzd25chrepx  | 0x02c22832bc115933Ac11388D5A91e0990eE84667  |
   
 ## License  
 DefArmy is released under the MIT License. See the [bundled LICENSE](https://github.com/dev-masih/defarmy/blob/master/LICENSE) file for details.  
